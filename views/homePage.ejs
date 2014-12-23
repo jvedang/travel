@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>TravelDB - Database of locations round the world!</title>
+<link rel='stylesheet' href='/stylesheets/style.css' />
+<link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+<script>
+function getPins(offset)
+{
+	var formData = 
+	{
+		"offset" : offset,
+		"set" : "0"
+	};
+	
+	alert(formData);
+	
+	$.ajax(
+			{
+				url : "/getPins",
+				type : "POST",
+				cache:false,
+				contentType : "application/json",
+				data : JSON.stringify(formData),
+				success : function(result) 
+				{
+					alert("We are getting correct response here :: "+result);
+					var parsedJSON = JSON.parse(result);
+					if (parsedJSON.status == 200)
+					{
+						alert("We are getting correct response here :: "+parsedJSON.categories);
+						
+						var categories = parsedJSON.categories;
+						if(categories!=null) 
+						{ 
+							categories.forEach(function(result)
+							{
+								/* $('#pins').append(
+								'<div class="row"'+
+									'style="width: 900px; margin: 0px auto; margin-top: 10px; box-shadow: 1px 0px 5px 1px rgba(0, 0, 0, 0.15); padding: 10px;">'+
+									'<div class="col-md-12">'+
+										'<div class="row">'+
+											'<div class="col-md-6">'+
+												'<h4 style="cursor: pointer;">'+result.location_name+'</h4>'+
+											'</div>'+
+											'<div class="col-md-6">'+
+												'<h5 style="cursor: pointer;">'+result.location_country+'</h5>'+
+											'</div>'+
+											'<div class="col-md-12">'+
+												'<h5 style="cursor: pointer;">'+result.location_address+'</h5>'+
+											'</div>'+
+											'<div class="col-md-12">'+
+												'<h5 style="cursor: pointer;">'+result.location_rating+'</h5>'+
+											'</div>'+
+										'</div>'+
+									'</div>'+
+								'</div>'
+								});  
+							}*/
+						}  
+					}	
+				},
+				error : function(err)
+				{
+					alert("Error "+ err);
+				}
+			});
+}
+
+window.onload = getPins(0);
+</script>
+
+
+</head>
+
+<body>
+	<div class="row" style="box-shadow: 1px 3px 4px 0 rgba(0, 0, 0, 0.15);">
+		<div class="col-md-4" style="padding-left: 60px;">
+			<h3>
+				<img alt="" src="/stylesheets/logo_icon.jpg" height="30" width="30">
+				&nbsp; <font color="#157DEC" size="4"><b>TravelDB - </b> </font> <small>
+					Database of locations!</small>
+			</h3>
+		</div>
+
+		<div class="col-md-2" style="margin-top: 20px;">
+			<input type="text" class="form-control" name="firstname"
+				placeholder="Email" />
+		</div>
+		<div class="col-md-2" style="margin-top: 20px;">
+			<input type="password" class="form-control" name="lastname"
+				placeholder="Password" />
+		</div>
+
+		<div class="col-md-1" style="margin-top: 20px;">
+			<input type="submit" class="btn btn-default" name="Log In"
+				value="Sign In" style="background: #157DEC; color: white;" />
+		</div>
+		<div class="col-md-2" style="margin-bottom: 20px;">
+			<h3>
+				<small>or &nbsp;&nbsp;&nbsp;<a href="./signup">Sign Up</a></small>
+			</h3>
+		</div>
+	</div>
+
+	<div class="row"
+		style="width: 900px; margin: 0px auto; margin-top: 10px; box-shadow: 1px 0px 5px 1px rgba(0, 0, 0, 0.15); padding: 10px;">
+		<div class="col-md-3">
+			<form method="post" action="pinLocation">
+				<input type="submit" class="form-control" name="pinLocation"
+					value="Pin a Location" style="background: #157DEC; color: white;" />
+			</form>
+		</div>
+		<div class="col-md-3">
+			<input type="submit" class="form-control" name="firstname"
+				value="Share a Moment" style="background: #157DEC; color: white;" />
+		</div>
+		<div class="col-md-3">
+			<input type="submit" class="form-control" name="firstname"
+				value="Publish an Album" style="background: #157DEC; color: white;" />
+		</div>
+		<div class="col-md-3">
+			<input type="submit" class="form-control" name="firstname"
+				value="Create a Tour" style="background: #157DEC; color: white;" />
+		</div>
+	</div>
+
+	
+	<div class="row">
+		<div class="col-md-12" id="pins">
+			
+		</div>
+	</div>
+</body>
+</html>

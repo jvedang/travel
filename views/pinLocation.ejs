@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>TravelDB - Database of locations round the world!</title>
+<link rel='stylesheet' href='/stylesheets/style.css' />
+<link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />
+<link rel='stylesheet' href='/stylesheets/stylesheet.css' />
+<style type="text/css">
+#map-canvas {
+	height: 100%;
+}
+</style>
+<script type="text/javascript"
+	src="https://maps.googleapis.com/maps/api/js?key=AIzaSyApNXTf01V3vzNMtRNGYBCxEXEaxAv8fBM"></script>
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script
+	src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+<script type="text/javascript">
+	var marker;
+	var infowindow;
+	function handleNoGeolocation(errorFlag) {
+		if (errorFlag) {
+			var content = 'Error: The Geolocation service failed.';
+		} else {
+			var content = 'Error: Your browser doesn\'t support geolocation.';
+		}
+
+		var options = {
+			map : map,
+			position : new google.maps.LatLng(60, 105),
+			content : content
+		};
+
+		var infowindow = new google.maps.InfoWindow(options);
+		map.setCenter(options.position);
+	}
+
+	function initialize() {
+		var mapOptions = {
+			zoom : 8
+		};
+
+		var map = new google.maps.Map(document.getElementById('map-canvas'),
+				mapOptions);
+
+		// Try HTML5 geolocation
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(function(position) {
+				var pos = new google.maps.LatLng(position.coords.latitude,
+						position.coords.longitude);
+
+				marker = new google.maps.Marker({
+					map : map,
+					position : pos,
+					title : 'Your Current Location'
+				});
+
+				document.getElementById('latitude').value = position.coords.latitude;
+				document.getElementById('longitude').value = position.coords.longitude;
+				
+				infowindow = new google.maps.InfoWindow();
+
+				codeLatLng(position.coords.latitude, position.coords.longitude,
+						map, marker);
+
+				google.maps.event.addListener(marker, 'click', function() {
+					infowindow.open(map, marker);
+				});
+
+				map.setCenter(pos);
+			}, function() {
+				handleNoGeolocation(true);
+			});
+		} else {
+			// Browser doesn't support Geolocation
+			handleNoGeolocation(false);
+		}
+		//setContent(marker);
+
+		google.maps.event.addListener(map, 'click',
+				function(event) {
+					if (marker) {
+						marker.setPosition(event.latLng);
+						codeLatLng(event.latLng.lat(), event.latLng.lng(), map,
+								marker);
+
+					} else {
+						marker = new google.maps.Marker({
+							position : location,
+							map : map
+						});
+					}
+					document.getElementById('latitude').value = event.latLng
+							.lat();
+					document.getElementById('longitude').value = event.latLng
+							.lng();
+
+				});
+	}
+
+	function setContent(marker) {
+
+	}
+
+	function codeLatLng(lat, lng, map, marker) {
+
+		var latlng = new google.maps.LatLng(lat, lng);
+
+		var geocoder = new google.maps.Geocoder();
+		geocoder
+				.geocode(
+						{
+							'latLng' : latlng
+						},
+						function(results, status) {
+
+							if (status == google.maps.GeocoderStatus.OK) {
+								if (results[1] != undefined) {
+									var result_country = results[1].formatted_address
+											.split(',');
+
+									//	marker.setTitle(result_country);
+									document.getElementById('address').value = result_country;
+									document.getElementById('country').value = result_country[result_country.length - 1];
+									infowindow.setContent(result_country);
+									infowindow.open(map, marker);
+								} else {
+									alert('No results found');
+								}
+							} else {
+								alert('Geocoder failed due to: ' + status);
+							}
+						});
+	}
+
+	google.maps.event.addDomListener(window, 'load', initialize);
+</script>
+
+</head>
+
+<body>
+	<form action="createPin" method="post">
+		<div class="row"
+			style="box-shadow: 1px 3px 4px 0 rgba(0, 0, 0, 0.15);">
+			<div class="col-md-4" style="padding-left: 60px;">
+				<h3>
+					<img alt="" src="/stylesheets/logo_icon.jpg" height="30" width="30">
+					&nbsp; <font color="#157DEC" size="4"><b>TravelDB - </b> </font> <small>
+						Database of locations!</small>
+				</h3>
+			</div>
+
+			<div class="col-md-2" style="margin-top: 20px;">
+				<input type="text" class="form-control" name="firstname"
+					placeholder="Email" />
+			</div>
+			<div class="col-md-2" style="margin-top: 20px;">
+				<input type="password" class="form-control" name="lastname"
+					placeholder="Password" />
+			</div>
+
+			<div class="col-md-1" style="margin-top: 20px;">
+				<input type="submit" class="btn btn-default" name="Log In"
+					value="Sign In" style="background: #157DEC; color: white;" />
+			</div>
+			<div class="col-md-2" style="margin-bottom: 20px;">
+				<h3>
+					<small>or &nbsp;&nbsp;&nbsp;<a href="./signup">Sign Up</a></small>
+				</h3>
+			</div>
+		</div>
+
+		<div class="row"
+			style="width: 900px; margin: 0px auto; box-shadow: 1px 0px 5px 8px rgba(0, 0, 0, 0.1); margin-top: 30px;">
+
+			<div class="col-md-12"
+				style="width: 900px; margin: 0px auto; margin-top: 15px;"
+				align="center">
+				<input type="submit" style="background: #157DEC; color: white;"
+					value="Pin The Location" class="btn btn-default" />
+			</div>
+			<div class="col-md-6">
+				<div class="row"
+					style="width: 400px; margin: 15px auto; margin-top: 30px;">
+
+					<div id="map-canvas" class="col-md-12"
+						style="height: 400px; box-shadow: 1px 0px 5px 3px rgba(0, 0, 0, 0.15); padding: 10px;"></div>
+
+					<input type="hidden" name="latitude" id="latitude" /> <input
+						type="hidden" name="longitude" id="longitude" />
+				</div>
+			</div>
+
+			<div class="col-md-6">
+				<div class="row"
+					style="width: 400px; margin: 0px auto; margin-top: 30px;">
+
+					<div id="" class="col-md-12" style="margin-top: 10px;">
+						<h4>
+							<small style="color: black;">Location Name</small>
+						</h4>
+					</div>
+
+					<div id="" class="col-md-12">
+						<input type="text" class="form-control" name="locationName"
+							placeholder="" style="color: black;" />
+					</div>
+
+					<div id="" class="col-md-12" style="margin-top: 10px;">
+						<h4>
+							<small style="color: black;">Address</small>
+						</h4>
+					</div>
+
+
+					<div id="" class="col-md-12" style="">
+						<input type="text" class="form-control" id="address" name="address"
+							placeholder="" style="color: black;" readonly="readonly" />
+					</div>
+
+					<div id="" class="col-md-12" style="margin-top: 10px;">
+						<h4>
+							<small style="color: black;">Country</small>
+						</h4>
+					</div>
+
+
+					<div id="" class="col-md-12" style="">
+						<input type="text" class="form-control" id="country" name="country"
+							placeholder="" style="color: black;" readonly="readonly" />
+					</div>
+
+				</div>
+			</div>
+
+			<div class="col-md-6">
+				<div class="row"
+					style="width: 400px; margin: 0px auto; margin-top: 10px;">
+
+					<div class="col-md-12" style="height: 100%;">
+						<h4>
+							<small style="color: black;">Rate Location</small>
+						</h4>
+					</div>
+					<div class="col-md-12" style="height: 100%;">
+						<div class="starRating">
+							<div>
+								<div>
+									<div>
+										<div>
+											<input id="rating1" type="radio" name="rating" value="1"/>
+											<label for="rating1"><span>1</span></label>
+										</div>
+										<input id="rating2" type="radio" name="rating" value="2" />
+										<label for="rating2"><span>2</span></label>
+									</div>
+									<input id="rating3" type="radio" name="rating" value="3" />
+									<label for="rating3"><span>3</span></label>
+								</div>
+								<input id="rating4" type="radio" name="rating" value="4" />
+								<label for="rating4"><span>4</span></label>
+							</div>
+							<input id="rating5" type="radio" name="rating" value="5" />
+							<label for="rating5"><span>5</span></label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+</body>
+</html>
